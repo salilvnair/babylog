@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.MainActivity">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStartEnd"
+            android:layout_marginEnd="@dimen/marginStartEnd"
+            android:background="@color/white"
+            app:cardCornerRadius="@dimen/corner_radius"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" >
+            <LinearLayout
+                android:id="@+id/ll_latest_fed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@color/ic_launcher_background"
+                android:padding="@dimen/content_padding">
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="@dimen/circular_image_size"
+                    android:layout_height="@dimen/circular_image_size"
+                    android:contentDescription="@string/image_content_description"
+                    android:src="@mipmap/ic_launcher_round"
+                    app:civ_border_color="@color/circular_image_border_color" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/recent_marginStart"
+                    android:layout_marginEnd="@dimen/recent_marginEnd"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/primary_text_color"
+                        android:textSize="@dimen/recent_title_textSize"
+                        android:textStyle="bold"
+                        android:text="Last Feed"
+                        tools:text="Last Feed" />
+
+                    <TextView
+                        android:id="@+id/tv_last_feed_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/recent_description_text_color"
+                        android:textSize="@dimen/recent_description_textSize"
+                        tools:text="33 min ago" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/changeTimeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="@dimen/fab_time_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        app:srcCompat="@drawable/change_time_24dp"
+        app:tint="@color/white"
+        app:backgroundTint="@color/primary_dark" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addItemBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/add_item_24dp"
+        app:tint="@color/white"
+        app:backgroundTint="@color/primary" />
+
+</FrameLayout>
