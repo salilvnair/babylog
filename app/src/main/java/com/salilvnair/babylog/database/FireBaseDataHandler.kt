@@ -9,6 +9,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.salilvnair.babylog.model.BabyLogModel
+import com.salilvnair.babylog.model.BabyThyroidRecordModel
+import java.util.*
 import java.util.stream.Collectors
 
 class FireBaseDataHandler {
@@ -18,6 +20,31 @@ class FireBaseDataHandler {
     fun db(): FirebaseFirestore {
         return db
     }
+
+    fun recordThyroidTabletCheck(model: BabyThyroidRecordModel) {
+        val log = hashMapOf(
+                "date" to Timestamp(model.date),
+                "completed" to model.completed
+        )
+        if(model.key != "") {
+            db
+                    .collection("thyroidlogs")
+                    .document(model.key!!)
+                    .set(log)
+        }
+        else {
+            db.collection("thyroidlogs")
+                    .add(log)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d("FB_ADD", "DocumentSnapshot added with ID: ${documentReference.id}")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w("FB_ADD_FAILED", "Error adding document", e)
+                    }
+        }
+    }
+
+
     fun add(model: BabyLogModel) {
         val log = hashMapOf(
             "lastFed" to Timestamp(model.lastFed!!)

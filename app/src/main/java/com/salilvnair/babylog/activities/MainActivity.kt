@@ -14,6 +14,8 @@ import com.salilvnair.babylog.database.FireBaseDataHandler
 import com.salilvnair.babylog.databinding.ActivityEditTimeBinding
 import com.salilvnair.babylog.databinding.ActivityMainBinding
 import com.salilvnair.babylog.model.BabyLogModel
+import com.salilvnair.babylog.model.BabyThyroidRecordModel
+import com.salilvnair.babylog.util.DateUtil
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var changeTimeBinding: ActivityEditTimeBinding
     private lateinit var docRef: Query
+    private lateinit var thyDocRef: Query
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -31,12 +34,39 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.swipeRefresh.setOnRefreshListener {
             Log.i("SWIPE_REFRESH", "onRefresh called from SwipeRefreshLayout")
             initData()
+            initThyData()
             binding.swipeRefresh.isRefreshing = false
         }
         var dbHandler = FireBaseDataHandler();
 
         docRef = dbHandler.db()?.collection("babylogs").orderBy("lastFed",Query.Direction.DESCENDING).limit(1)
+        thyDocRef = dbHandler.db()?.collection("thyroidlogs").limit(1)
         initData()
+        initThyData()
+    }
+
+    private fun initThyData() {
+        if(!DateUtil.dateTimeAfter("06:00")) {
+            return
+        }
+        thyDocRef?.get()?.addOnSuccessListener { collectionSnapshot ->
+            if(collectionSnapshot.isEmpty) {
+                showThyDialog(null)
+            }
+            collectionSnapshot.forEach { s ->
+                val babyThyModel = s.toObject(BabyThyroidRecordModel::class.java)
+                val today = DateUtil.formattedDate(Date())
+                val thyDay = DateUtil.formattedDate(babyThyModel.date)
+                babyThyModel.key = s.id
+                if(today != thyDay) {
+                    babyThyModel.completed = false
+                    babyThyModel.date = Date()
+                }
+                if(!babyThyModel.completed) {
+                    showThyDialog(babyThyModel)
+                }
+            }
+        }
     }
 
     private fun initData() {
@@ -92,6 +122,36 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 startActivity(intent)
             }
         }
+    }
+
+    private fun showThyDialog(model: BabyThyroidRecordModel?) {
+        val alertDialog: AlertDialog  = AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Did you give thyroid tablet today!");
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", DialogInterface.OnClickListener() { _: DialogInterface, i: Int ->
+            val dbHandler = FireBaseDataHandler()
+            var thyModel = BabyThyroidRecordModel("",true, Date())
+            if(model != null) {
+                thyModel = model
+            }
+            thyModel.completed = true
+            dbHandler.recordThyroidTabletCheck(thyModel)
+            alertDialog.dismiss()
+        });
+
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", DialogInterface.OnClickListener() { _: DialogInterface, i: Int ->
+            val dbHandler = FireBaseDataHandler()
+            var thyModel = BabyThyroidRecordModel("",false, Date())
+            if(model != null) {
+                thyModel = model
+            }
+            dbHandler.recordThyroidTabletCheck(thyModel)
+            alertDialog.dismiss()
+        });
+
+        //alertDialog.setView(binding.root);
+        alertDialog.show();
     }
 
 
